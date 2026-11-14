@@ -31,6 +31,9 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Accept Android SDK Licenses
+        run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+
       - name: Verify Flutter Installation
         run: flutter doctor -v
 
@@ -41,7 +44,7 @@ jobs:
         run: flutter test --coverage
 
       - name: Build Android Debug APK
-        run: flutter build apk --debug
+        run: flutter build apk --debug -v
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
