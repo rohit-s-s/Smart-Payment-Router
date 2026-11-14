@@ -1,4 +1,4 @@
-name: Build Smart Payment Router Android APK
+name: Build Smart Payment Router Flutter APK
 
 on:
   push:
@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   build-apk:
-    name: Build Android Debug APK
+    name: Build Flutter Android Debug APK
     runs-on: ubuntu-latest
 
     steps:
@@ -25,43 +25,29 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Setup Gradle 8.9
-        uses: gradle/actions/setup-gradle@v4
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
         with:
-          gradle-version: '8.9'
+          channel: 'stable'
+          cache: true
 
-      - name: Accept Android SDK licenses
-        run: |
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+      - name: Verify Flutter Installation
+        run: flutter doctor -v
 
-      - name: Make gradlew executable
-        run: |
-          if [ -d "android" ] && [ -f "android/gradlew" ]; then
-            chmod +x android/gradlew
-          elif [ -f "./gradlew" ]; then
-            chmod +x ./gradlew
-          fi
+      - name: Get Flutter dependencies
+        run: flutter pub get
+
+      - name: Run Unit Tests
+        run: flutter test --coverage
 
       - name: Build Android Debug APK
-        run: |
-          if [ -d "android" ] && [ -f "android/gradlew" ]; then
-            cd android
-          fi
-          
-          chmod +x ./gradlew
-          ./gradlew assembleDebug --no-daemon --stacktrace 2>&1 | tee gradle.log
-          BUILD_CODE=${PIPESTATUS[0]}
-          if [ $BUILD_CODE -ne 0 ]; then
-            ERRORS=$(grep -i -C 2 -E "(e: |error: |FAILURE:|Task.*FAILED)" gradle.log | tail -n 25 | tr '\n' ' ')
-            echo "::error title=Gradle Build Error::$ERRORS"
-            exit $BUILD_CODE
-          fi
+        run: flutter build apk --debug
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: smart-payment-router-debug-apk
-          path: "**/app/build/outputs/apk/debug/*.apk"
+          path: build/app/outputs/flutter-apk/app-debug.apk
           if-no-files-found: error
           retention-days: 14
 
@@ -69,12 +55,12 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: "**/app/build/outputs/apk/debug/*.apk"
+          files: build/app/outputs/flutter-apk/app-debug.apk
           name: "Smart Payment Router ${{ github.ref_name }}"
           body: |
-            ### Smart Payment Router Android APK Release
-            - Native Jetpack Compose + CameraX + ML Kit Android Application
-            - Real-time UPI QR Scanner, MCC-based Category Detection & Dynamic Card Reward Routing
+            ### Smart Payment Router Cross-Platform Flutter Release
+            - Cross-platform Flutter + Material 3 implementation
+            - Epic 1: Real-time UPI QR Scanner, MCC-based Category Detection & Dynamic Card Reward Routing
             - Epic 2: Add/Edit/Delete Cards & Offers, Exclusions & 90-Day Rule Review
             - Download `app-debug.apk` below and install directly on your Android device!
         env:

@@ -6,6 +6,12 @@ APK File/
 # Testing Logs
 log/
 
+# Flutter & Dart
+.dart_tool/
+.packages
+.flutter-plugins
+.flutter-plugins-dependencies
+
 # Gradle & Build caches
 .gradle/
 build/
@@ -14,7 +20,6 @@ local.properties
 .idea/
 *.iml
 .DS_Store
-
 
 # Supporting Documents
 user_stories
