@@ -1,0 +1,16 @@
+# Built binaries & APKs
+*.apk
+*.aab
+APK File/
+
+# Testing Logs
+log/
+
+# Gradle & Build caches
+.gradle/
+build/
+*/build/
+local.properties
+.idea/
+*.iml
+.DS_Store
