@@ -3,7 +3,7 @@ name: Build Smart Payment Router Android APK
 on:
   push:
     branches: [ master, main ]
-  workflow_dispatch: # Allows manual trigger from GitHub Actions tab
+  workflow_dispatch:
 
 jobs:
   build-apk:
@@ -24,16 +24,24 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Make gradlew executable
-        run: chmod +x android/gradlew
+        run: |
+          if [ -f "./gradlew" ]; then
+            chmod +x ./gradlew
+          elif [ -f "./android/gradlew" ]; then
+            chmod +x ./android/gradlew
+          fi
 
       - name: Build Android Debug APK
         run: |
-          cd android
-          ./gradlew assembleDebug --no-daemon
+          if [ -f "./gradlew" ]; then
+            ./gradlew assembleDebug --no-daemon
+          else
+            cd android && ./gradlew assembleDebug --no-daemon
+          fi
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: smart-payment-router-debug-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          path: "**/app/build/outputs/apk/debug/*.apk"
           retention-days: 14
