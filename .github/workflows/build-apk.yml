@@ -44,7 +44,16 @@ jobs:
         run: flutter test --coverage
 
       - name: Build Android Debug APK
-        run: flutter build apk --debug -v
+        run: |
+          flutter build apk --debug 2>&1 | tee build.log
+          BUILD_CODE=${PIPESTATUS[0]}
+          if [ $BUILD_CODE -ne 0 ]; then
+            echo "=== BUILD ERROR TAIL LOG ==="
+            tail -n 120 build.log
+            ERRORS=$(grep -i -C 2 -E "(e: |error: |FAILURE:|Task.*FAILED)" build.log | tail -n 25 | tr '\n' ' ')
+            echo "::error title=Flutter Build Error::$ERRORS"
+            exit $BUILD_CODE
+          fi
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4

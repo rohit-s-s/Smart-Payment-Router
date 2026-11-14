@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_mlkit_barcode_scanning/google_mlkit_barcode_scanning.dart'
-    as mlkit;
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../data/payment_repository.dart';
@@ -171,16 +169,12 @@ class _ScanQrScreenState extends State<ScanQrScreen> {
       final pickedFile = await picker.pickImage(source: ImageSource.gallery);
       if (pickedFile == null) return;
 
-      final inputImage = mlkit.InputImage.fromFilePath(pickedFile.path);
-      final barcodeScanner = mlkit.BarcodeScanner(
-        formats: [mlkit.BarcodeFormat.qrCode],
-      );
+      final capture = await _scannerController.analyzeImage(pickedFile.path);
 
-      final barcodes = await barcodeScanner.processImage(inputImage);
-      await barcodeScanner.close();
-
-      if (barcodes.isNotEmpty && barcodes.first.rawValue != null) {
-        _handleQrCode(barcodes.first.rawValue!);
+      if (capture != null &&
+          capture.barcodes.isNotEmpty &&
+          capture.barcodes.first.rawValue != null) {
+        _handleQrCode(capture.barcodes.first.rawValue!);
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
