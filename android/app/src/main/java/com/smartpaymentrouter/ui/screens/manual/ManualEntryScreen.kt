@@ -249,7 +249,7 @@ fun ManualEntryScreen(
             )
 
             // 8 Fixed Categories Grid
-            val categories = SpendCategory.values()
+            val categories = SpendCategory.entries
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 for (row in categories.toList().chunked(2)) {
                     Row(
