@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Smart Payment Router (Epic 1: Capturing a Payment)
 
 An intelligent payment router web application that helps users maximize rewards and cashback for every transaction by analyzing their cards, UPI apps, reward caps, and active offers at the moment of payment.
@@ -70,24 +69,3 @@ Built based on **Epic 1: Capturing a Payment** (`User_Stories/epic1.txt`) and **
 
 ---
 
-## 🛠️ Tech Stack
-
-- **Frontend**: React 18, TypeScript, Tailwind CSS, Lucide Icons
-- **QR Decoding**: jsQR (pure JavaScript canvas scanner, works offline)
-- **Build Tool**: Vite
-- **Testing**: Vitest (13/13 unit and acceptance tests passing)
-
----
-
-## 🧪 Running Tests & Development
-
-```bash
-# Run unit & acceptance test suite
-npm run test
-
-# Start development server
-npm run dev
-
-# Build production bundle
-npm run build
-```

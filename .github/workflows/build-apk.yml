@@ -44,7 +44,13 @@ jobs:
           fi
           
           chmod +x ./gradlew
-          ./gradlew assembleDebug --no-daemon --stacktrace || gradle assembleDebug --no-daemon --stacktrace
+          ./gradlew assembleDebug --no-daemon --stacktrace 2>&1 | tee gradle.log
+          BUILD_CODE=${PIPESTATUS[0]}
+          if [ $BUILD_CODE -ne 0 ]; then
+            ERRORS=$(grep -i -C 2 -E "(e: |error: |FAILURE:|Task.*FAILED)" gradle.log | tail -n 25 | tr '\n' ' ')
+            echo "::error title=Gradle Build Error::$ERRORS"
+            exit $BUILD_CODE
+          fi
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
