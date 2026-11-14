@@ -20,8 +20,10 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Setup Gradle
+      - name: Setup Gradle 8.9
         uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
 
       - name: Accept Android SDK licenses
         run: |
@@ -41,27 +43,10 @@ jobs:
             cd android
           fi
           
-          # Run Gradle build and capture output for diagnostics if it fails
-          ./gradlew assembleDebug --no-daemon --stacktrace > build_output.log 2>&1 || {
-            BUILD_STATUS=$?
-            echo "### ❌ Android Build Failed (Exit Code: $BUILD_STATUS)" >> $GITHUB_STEP_SUMMARY
-            echo '```text' >> $GITHUB_STEP_SUMMARY
-            tail -n 80 build_output.log >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            cat build_output.log
-            exit $BUILD_STATUS
-          }
-
-      - name: Upload Build Log on Failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: gradle-build-failure-log
-          path: "**/build_output.log"
-          retention-days: 7
+          chmod +x ./gradlew
+          ./gradlew assembleDebug --no-daemon --stacktrace || gradle assembleDebug --no-daemon --stacktrace
 
       - name: Upload APK Artifact
-        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: smart-payment-router-debug-apk
