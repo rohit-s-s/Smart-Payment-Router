@@ -20,28 +20,32 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Accept Android SDK licenses
+        run: |
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
       - name: Make gradlew executable
         run: |
-          if [ -f "./gradlew" ]; then
+          if [ -d "android" ] && [ -f "android/gradlew" ]; then
+            chmod +x android/gradlew
+          elif [ -f "./gradlew" ]; then
             chmod +x ./gradlew
-          elif [ -f "./android/gradlew" ]; then
-            chmod +x ./android/gradlew
           fi
 
       - name: Build Android Debug APK
         run: |
-          if [ -f "./gradlew" ]; then
-            ./gradlew assembleDebug --no-daemon
-          else
-            cd android && ./gradlew assembleDebug --no-daemon
+          if [ -d "android" ] && [ -f "android/gradlew" ]; then
+            cd android
           fi
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: smart-payment-router-debug-apk
           path: "**/app/build/outputs/apk/debug/*.apk"
+          if-no-files-found: error
           retention-days: 14
