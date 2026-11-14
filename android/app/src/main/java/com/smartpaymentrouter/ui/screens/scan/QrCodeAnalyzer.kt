@@ -35,14 +35,12 @@ class QrCodeAnalyzer(
             val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
             scanner.process(image)
                 .addOnSuccessListener { barcodes ->
-                    for (barcode in barcodes) {
-                        if (barcode.format == Barcode.FORMAT_QR_CODE) {
-                            barcode.rawValue?.let { value ->
-                                isScanning = false
-                                onQrCodeScanned(value)
-                                break
-                            }
-                        }
+                    val qrCode = barcodes.firstOrNull { 
+                        it.format == Barcode.FORMAT_QR_CODE && !it.rawValue.isNullOrBlank() 
+                    }
+                    if (qrCode?.rawValue != null) {
+                        isScanning = false
+                        onQrCodeScanned(qrCode.rawValue!!)
                     }
                 }
                 .addOnFailureListener {
