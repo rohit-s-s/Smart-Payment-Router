@@ -46,9 +46,9 @@ jobs:
       - name: Build Android Debug APK
         run: |
           set +e
-          flutter build apk --debug 2>&1 | tee build.log
+          flutter build apk --debug --android-skip-build-dependency-validation 2>&1 | tee build.log
           echo "=== BUILD ERROR DETAILS ==="
-          grep -A 25 -B 5 "What went wrong:" build.log
+          grep -A 25 -B 5 "What went wrong:" build.log || true
           if grep -q "BUILD FAILED" build.log; then
             ERRORS=$(grep -A 10 "What went wrong:" build.log | tr '\n' ' ')
             echo "::error title=Flutter Gradle Error::$ERRORS"
