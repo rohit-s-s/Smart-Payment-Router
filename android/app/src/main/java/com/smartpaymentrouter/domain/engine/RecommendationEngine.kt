@@ -45,8 +45,14 @@ object RecommendationEngine {
             var categoryBonus = 0.0
             var excessAtBaseRate = 0.0
             var isCapReached = false
+            val isExcluded = method.exclusions.contains(category)
 
-            if (categoryRate > baseRate) {
+            if (isExcluded) {
+                // Category is excluded from rewards on this method (US-04)
+                baseReward = 0.0
+                categoryBonus = 0.0
+                excessAtBaseRate = 0.0
+            } else if (categoryRate > baseRate) {
                 val potentialBonus = (amount * categoryRate) / 100.0
                 if (potentialBonus <= remainingCap) {
                     categoryBonus = roundTwoDecimals(potentialBonus)
@@ -138,6 +144,7 @@ object RecommendationEngine {
 
             // Reason construction
             var reason = when {
+                isExcluded -> "${category.displayName} is excluded from rewards on this card"
                 specificRule != null && specificRule.rate > baseRate -> {
                     if (isCapReached) {
                         "${specificRule.rate}% ${category.displayName} bonus capped at ₹${categoryBonus.toInt()}" +

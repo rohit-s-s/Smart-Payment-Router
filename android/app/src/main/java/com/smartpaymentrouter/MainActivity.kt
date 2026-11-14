@@ -181,24 +181,22 @@ class MainActivity : ComponentActivity() {
                             Screen.Cards -> {
                                 CardsScreen(
                                     methods = methods,
-                                    onToggleMethod = { methodId ->
-                                        val updated = methods.map {
-                                            if (it.id == methodId) it.copy(isActive = !it.isActive) else it
-                                        }
-                                        repository.updateMethods(updated)
-                                    }
+                                    onToggleMethod = { methodId -> repository.toggleMethod(methodId) },
+                                    onAddMethod = { newMethod -> repository.addMethod(newMethod) },
+                                    onEditMethod = { updatedMethod -> repository.editMethod(updatedMethod) },
+                                    onDeleteMethod = { methodId -> repository.deleteMethod(methodId) },
+                                    onConfirmRules = { methodId -> repository.confirmMethodRules(methodId) }
                                 )
                             }
                             Screen.Offers -> {
                                 OffersScreen(
                                     offers = offers,
                                     methods = methods,
-                                    onToggleOffer = { offerId ->
-                                        val updated = offers.map {
-                                            if (it.id == offerId) it.copy(isActive = !it.isActive) else it
-                                        }
-                                        repository.updateOffers(updated)
-                                    }
+                                    onToggleOffer = { offerId -> repository.toggleOffer(offerId) },
+                                    onAddOffer = { newOffer -> repository.addOffer(newOffer) },
+                                    onEditOffer = { updatedOffer -> repository.editOffer(updatedOffer) },
+                                    onDeleteOffer = { offerId -> repository.deleteOffer(offerId) },
+                                    onMarkOfferUsed = { offerId -> repository.markOfferUsed(offerId) }
                                 )
                             }
                             Screen.History -> {

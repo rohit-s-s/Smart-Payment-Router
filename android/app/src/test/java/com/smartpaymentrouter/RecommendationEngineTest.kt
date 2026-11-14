@@ -191,4 +191,69 @@ class RecommendationEngineTest {
         // 100 calculations should finish in well under 100ms (< 1ms per run, beating 2000ms threshold)
         assertTrue(elapsed < 200)
     }
+
+    @Test
+    fun testUS04_categoryExclusionGivesZeroReward() {
+        // Given a card with 1% base rate and 5% dining, but FUEL is in exclusions
+        val cardWithFuelExcluded = cardWith5PercentDining.copy(
+            exclusions = listOf(SpendCategory.FUEL)
+        )
+
+        val results = RecommendationEngine.calculate(
+            amount = 1000.0,
+            category = SpendCategory.FUEL,
+            methods = listOf(cardWithFuelExcluded),
+            offers = emptyList()
+        )
+
+        assertEquals(1, results.size)
+        val rec = results.first()
+        assertEquals(0.0, rec.effectiveReward, 0.01)
+        assertTrue(rec.reason.contains("excluded from rewards"))
+    }
+
+    @Test
+    fun testUS06_offerUsageCapExhaustedNotRecommended() {
+        val cappedOffer = Offer(
+            id = "test-offer-cap",
+            methodId = "test-card-dining",
+            title = "Limited 3 Times Offer",
+            description = "10% off",
+            discountPercent = 10.0,
+            usageCap = 3,
+            usageCount = 3, // Already used 3 times out of 3!
+            isActive = true
+        )
+
+        val results = RecommendationEngine.calculate(
+            amount = 500.0,
+            category = SpendCategory.DINING,
+            methods = listOf(cardWith5PercentDining),
+            offers = listOf(cappedOffer)
+        )
+
+        // Offer is exhausted, so breakdown.offerReward must be 0
+        assertEquals(0.0, results.first().breakdown.offerReward, 0.01)
+        assertNull(results.first().breakdown.appliedOffer)
+    }
+
+    @Test
+    fun testUS07_outdatedRulesFlagsWarning() {
+        // Last confirmed 120 days ago (>90 days threshold)
+        val outdatedCard = cardWith5PercentDining.copy(
+            ruleLastConfirmed = "2026-06-01"
+        )
+
+        assertTrue(outdatedCard.isOutdated(90))
+
+        val results = RecommendationEngine.calculate(
+            amount = 500.0,
+            category = SpendCategory.DINING,
+            methods = listOf(outdatedCard),
+            offers = emptyList()
+        )
+
+        assertNotNull(results.first().ruleWarning)
+        assertTrue(results.first().ruleWarning!!.contains("last verified"))
+    }
 }

@@ -37,6 +37,7 @@ object DefaultDataProvider {
                 RewardRule(SpendCategory.DINING, 5.0, "monthly", 5000.0),
                 RewardRule(null, 1.0)
             ),
+            exclusions = listOf(SpendCategory.FUEL),
             monthlyCap = 5000.0,
             currentMonthRewardUsed = 850.0,
             ruleLastConfirmed = "2026-11-01",
