@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Dependencies
 node_modules/
 .pnpm-store/
@@ -22,3 +23,8 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+=======
+node_modules
+
+.env
+>>>>>>> bc23b1cb9ccc4f2efb6cfd6f0f2ed664c82b02ce
