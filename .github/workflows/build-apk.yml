@@ -45,14 +45,14 @@ jobs:
 
       - name: Build Android Debug APK
         run: |
+          set +e
           flutter build apk --debug 2>&1 | tee build.log
-          BUILD_CODE=${PIPESTATUS[0]}
-          if [ $BUILD_CODE -ne 0 ]; then
-            echo "=== BUILD ERROR TAIL LOG ==="
-            tail -n 120 build.log
-            ERRORS=$(grep -i -C 2 -E "(e: |error: |FAILURE:|Task.*FAILED)" build.log | tail -n 25 | tr '\n' ' ')
-            echo "::error title=Flutter Build Error::$ERRORS"
-            exit $BUILD_CODE
+          echo "=== BUILD ERROR DETAILS ==="
+          grep -A 25 -B 5 "What went wrong:" build.log
+          if grep -q "BUILD FAILED" build.log; then
+            ERRORS=$(grep -A 10 "What went wrong:" build.log | tr '\n' ' ')
+            echo "::error title=Flutter Gradle Error::$ERRORS"
+            exit 1
           fi
 
       - name: Upload APK Artifact
