@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Smart Payment Router</string>
+    <string name="scan_qr_title">Scan QR</string>
+    <string name="manual_entry_title">Manual Entry</string>
+    <string name="cards_title">My Cards</string>
+    <string name="offers_title">Offers</string>
+    <string name="history_title">History</string>
+    <string name="camera_permission_required">Camera permission is required to scan UPI QR codes.</string>
+</resources>
