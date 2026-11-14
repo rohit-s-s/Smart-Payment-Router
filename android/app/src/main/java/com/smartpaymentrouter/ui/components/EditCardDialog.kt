@@ -25,6 +25,11 @@ import com.smartpaymentrouter.ui.theme.*
 import java.text.SimpleDateFormat
 import java.util.*
 
+data class BonusRuleInput(
+    val category: SpendCategory,
+    val rate: String
+)
+
 @Composable
 fun EditCardDialog(
     initialMethod: PaymentMethod? = null,
@@ -44,10 +49,10 @@ fun EditCardDialog(
 
     // Dynamic bonus rules: Category -> Rate%
     var bonusRules by remember {
-        mutableStateOf(
+        mutableStateOf<List<BonusRuleInput>>(
             initialMethod?.rules?.filter { it.category != null }?.map {
-                it.category!! to it.rate.toString()
-            }?.toMutableList() ?: mutableListOf()
+                BonusRuleInput(it.category!!, it.rate.toString())
+            } ?: emptyList()
         )
     }
 
@@ -291,7 +296,7 @@ fun EditCardDialog(
                             color = TextPrimary
                         )
 
-                        bonusRules.forEachIndexed { index, (cat, rate) ->
+                        bonusRules.forEachIndexed { index, ruleInput ->
                             Surface(
                                 color = DarkSurfaceVariant,
                                 shape = RoundedCornerShape(10.dp),
@@ -306,12 +311,12 @@ fun EditCardDialog(
                                 ) {
                                     Column {
                                         Text(
-                                            text = cat.displayName,
+                                            text = ruleInput.category.displayName,
                                             style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
                                             color = TextPrimary
                                         )
                                         Text(
-                                            text = "$rate% Cashback",
+                                            text = "${ruleInput.rate}% Cashback",
                                             style = MaterialTheme.typography.bodySmall,
                                             color = AmberGold
                                         )
@@ -388,14 +393,8 @@ fun EditCardDialog(
                                 onClick = {
                                     val r = newCategoryRateStr.toDoubleOrNull()
                                     if (r != null && r > 0) {
-                                        val updated = bonusRules.toMutableList()
-                                        // Replace if exists, else add
-                                        val existingIndex = updated.indexOfFirst { it.first == selectedNewCategory }
-                                        if (existingIndex >= 0) {
-                                            updated[existingIndex] = selectedNewCategory to newCategoryRateStr
-                                        } else {
-                                            updated.add(selectedNewCategory to newCategoryRateStr)
-                                        }
+                                        val updated = bonusRules.filter { it.category != selectedNewCategory }.toMutableList()
+                                        updated.add(BonusRuleInput(selectedNewCategory, newCategoryRateStr))
                                         bonusRules = updated
                                     }
                                 },
@@ -514,9 +513,9 @@ fun EditCardDialog(
                             val today = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
 
                             val rules = mutableListOf<RewardRule>()
-                            bonusRules.forEach { (cat, rStr) ->
-                                rStr.toDoubleOrNull()?.let { r ->
-                                    rules.add(RewardRule(category = cat, rate = r, capPeriod = "monthly"))
+                            bonusRules.forEach { ruleInput ->
+                                ruleInput.rate.toDoubleOrNull()?.let { r ->
+                                    rules.add(RewardRule(category = ruleInput.category, rate = r, capPeriod = "monthly"))
                                 }
                             }
                             rules.add(RewardRule(category = null, rate = baseRate))
