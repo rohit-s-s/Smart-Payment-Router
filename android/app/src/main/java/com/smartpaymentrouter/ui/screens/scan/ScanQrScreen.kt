@@ -22,6 +22,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -42,7 +43,7 @@ fun ScanQrScreen(
     onQrDecoded: (String) -> Unit
 ) {
     val context = LocalContext.current
-    val lifecycleOwner = context as LifecycleOwner
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     var hasCameraPermission by remember {
         mutableStateOf(

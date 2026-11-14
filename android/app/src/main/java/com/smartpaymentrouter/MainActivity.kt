@@ -117,10 +117,10 @@ class MainActivity : ComponentActivity() {
                                 NavigationBarItem(
                                     icon = { Icon(screen.icon, contentDescription = screen.title) },
                                     label = { Text(screen.title) },
-                                    selected = currentScreen.route == screen.route,
+                                    selected = currentScreen == screen,
                                     onClick = {
                                         currentScreen = screen
-                                        if (screen.route == Screen.Manual.route && paymentDraft.amount == null) {
+                                        if (screen == Screen.Manual && paymentDraft.amount == null) {
                                             activeRecommendations = null
                                         }
                                     }
